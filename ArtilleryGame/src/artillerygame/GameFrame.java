@@ -46,7 +46,6 @@ public class GameFrame extends JFrame {
     private JTextField player2power;
     private JButton Fire1 = new JButton("Fire!");
     private JButton Fire2 = new JButton("Fire!");
-    private TerrainController terraincontroller;
     private JSlider Power1 = new JSlider(0, 100);
     private JSlider Angle1 = new JSlider(0, 180);
     private JSlider Power2 = new JSlider(0, 100);
@@ -83,7 +82,7 @@ public class GameFrame extends JFrame {
 
         player1score = new JTextField(score1 + "");
         player2score = new JTextField(score2 + "");
-        
+
         player1damages = new JTextField(score2 + "");
         player1damages.setEditable(false);
         player2damages = new JTextField(score1 + "");
@@ -151,12 +150,8 @@ public class GameFrame extends JFrame {
         Game.setLayout(new GridLayout(1, 1));
         Game.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
-        Terrain terrain = new Terrain(Game.getWidth(), Game.getHeight());
-        TerrainView terrainview = new TerrainView(terrain);
-        terraincontroller = new TerrainController(terrain, terrainview);
-
-        Game.add(terrainview);
-        terraincontroller.start();
+        World world = new World();
+        Game.add(world.getView());
         return Game;
     }
 
@@ -218,7 +213,6 @@ public class GameFrame extends JFrame {
         score2 = 0;
         player1score.setText(score1 + "");
         player2score.setText(score2 + "");
-        terraincontroller.restart();
     }
 
     public void createNameListeners() {
