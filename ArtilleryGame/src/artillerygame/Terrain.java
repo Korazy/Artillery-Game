@@ -1,5 +1,6 @@
 package artillerygame;
 
+import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -13,7 +14,6 @@ import java.util.Random;
 import javax.imageio.ImageIO;
 
 import javax.swing.JComponent;
-
 
 public class Terrain {
 
@@ -93,33 +93,50 @@ class TerrainView extends JComponent {
 
     public TerrainView(Terrain model) {
         this.model = model;
+        File imagefile = new File("C:\\Users\\Korazy\\Documents\\GitHub\\Artillery-Game\\ArtilleryGame\\src\\artillerygame\\space.jpg");
+        try {
+            img = ImageIO.read(imagefile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        File imagefile = new File(".\\outer-space_8.jpg");
-        try{
-            img = ImageIO.read(imagefile);
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
-        g2.drawImage(img,0,0,null);
+        g2.drawImage(img, 0, 0, null);
 
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setColor(Color.WHITE);
+        g2.setStroke(new BasicStroke(1.5f));
+        g2.setColor(c);
 
         for (Line2D line : model.getLines()) {
             g2.draw(line);
         }
     }
 
+    public void setBackground(String name) {
+        File imagefile = new File("C:\\Users\\Korazy\\Documents\\GitHub\\Artillery-Game\\ArtilleryGame\\src\\artillerygame\\" + name + ".jpg");
+        try {
+            img = ImageIO.read(imagefile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (name.equals("space")) {
+            c = Color.WHITE;
+        } else if (name.equals("nature")) {
+            c = Color.RED;
+        } else {
+            c = Color.BLACK;
+        }
+        repaint();
+    }
     private Terrain model;
     private BufferedImage img;
+    private Color c = Color.WHITE;
 }
 
 class TerrainController {

@@ -10,17 +10,21 @@ import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
-import java.text.NumberFormat;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
+import javax.swing.ActionMap;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.InputMap;
 import javax.swing.JButton;
-import javax.swing.JFormattedTextField;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.border.BevelBorder;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -31,6 +35,8 @@ public class GameFrame extends JFrame {
     private int score2 = 0;
     private boolean turn = false;
     private PrintWriter out;
+    private ActionMap amap;
+    private TerrainView terrainview;
     private JTextField player1name;
     private JTextField player2name;
     private JTextField player1nameShow;
@@ -44,13 +50,15 @@ public class GameFrame extends JFrame {
     private JTextField player2angle;
     private JTextField player1angle;
     private JTextField player2power;
-    private JButton Fire1 = new JButton("Fire!");
-    private JButton Fire2 = new JButton("Fire!");
+    private JButton Fire1;
+    private JButton Fire2;
+    private JButton Restart;
+    private JButton Exit;
     private TerrainController terraincontroller;
-    private JSlider Power1 = new JSlider(0, 100);
-    private JSlider Angle1 = new JSlider(0, 180);
-    private JSlider Power2 = new JSlider(0, 100);
-    private JSlider Angle2 = new JSlider(0, 180);
+    private JSlider Power1 = new JSlider(0, 100, 0);
+    private JSlider Angle1 = new JSlider(0, 180, 0);
+    private JSlider Power2 = new JSlider(0, 100, 0);
+    private JSlider Angle2 = new JSlider(0, 180, 0);
 
     public GameFrame() {
         varInit();
@@ -61,6 +69,7 @@ public class GameFrame extends JFrame {
         createView();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GameUpdate();
+        new NameFrame();
     }
 
     public void varInit() {
@@ -71,7 +80,9 @@ public class GameFrame extends JFrame {
         }
 
         player1name = new JTextField("Player 1");
+        player1name.setEditable(false);
         player2name = new JTextField("Player 2");
+        player2name.setEditable(false);
 
         player1nameShow = new JTextField("Player 1");
         player1nameShow.setEditable(false);
@@ -83,16 +94,16 @@ public class GameFrame extends JFrame {
 
         player1score = new JTextField(score1 + "");
         player2score = new JTextField(score2 + "");
-        
+
         player1damages = new JTextField(score2 + "");
         player1damages.setEditable(false);
         player2damages = new JTextField(score1 + "");
         player2damages.setEditable(false);
 
-        player1power = new JFormattedTextField(NumberFormat.getInstance());
-        player2angle = new JFormattedTextField(NumberFormat.getInstance());
-        player1angle = new JFormattedTextField(NumberFormat.getInstance());
-        player2power = new JFormattedTextField(NumberFormat.getInstance());
+        player1power = new JTextField("0");
+        player2angle = new JTextField("0");
+        player1angle = new JTextField("0");
+        player2power = new JTextField("0");
 
         player1score.setEditable(false);
         player2score.setEditable(false);
@@ -110,9 +121,9 @@ public class GameFrame extends JFrame {
         GeneralPanel.add(PlayerPanel, BorderLayout.NORTH);
         GeneralPanel.add(GamePanel, BorderLayout.CENTER);
         GeneralPanel.add(ControlPanel, BorderLayout.SOUTH);
+        createKeyMapping(GeneralPanel);
 
         add(GeneralPanel);
-        createNameListeners();
     }
 
     public JPanel createPlayers() {
@@ -152,7 +163,7 @@ public class GameFrame extends JFrame {
         Game.setBorder(BorderFactory.createBevelBorder(BevelBorder.LOWERED));
 
         Terrain terrain = new Terrain(Game.getWidth(), Game.getHeight());
-        TerrainView terrainview = new TerrainView(terrain);
+        terrainview = new TerrainView(terrain);
         terraincontroller = new TerrainController(terrain, terrainview);
 
         Game.add(terrainview);
@@ -195,12 +206,12 @@ public class GameFrame extends JFrame {
         player1.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(128, 0, 0)));
         player2.setBorder(BorderFactory.createMatteBorder(3, 3, 3, 3, new Color(0, 0, 128)));
 
-        JButton Exit = new JButton("Exit");
-        JButton Restart = new JButton("Restart");
+        Exit = new JButton("Quit");
+        Restart = new JButton("Restart");
         JButton Save = new JButton("Save");
-        JButton Options = new JButton("Options"); //add listeners
+        JButton Options = new JButton("Options");
 
-        createButtonListeners(Exit, Restart, Save, Options);
+        createButtonListeners(Save, Options);
         Buttons.add(Exit);
         Buttons.add(Save);
         Buttons.add(CurrentPlayer);
@@ -219,38 +230,12 @@ public class GameFrame extends JFrame {
         player1score.setText(score1 + "");
         player2score.setText(score2 + "");
         terraincontroller.restart();
-    }
-
-    public void createNameListeners() {
-        player1name.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                player1nameShow.setText(player1name.getText());
-                GameUpdate();
-            }
-        });
-        player2name.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                player2nameShow.setText(player2name.getText());
-                GameUpdate();
-            }
-        });
+        new NameFrame();
     }
 
     public void createFireListeners() {
-        Fire1.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Proceed with firing animation
-                turn = true;
-                GameUpdate();
-            }
-        });
-        Fire2.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                // Proceed with firing animation
-                turn = false;
-                GameUpdate();
-            }
-        });
+        Fire1 = new JButton(new FireAction(true));
+        Fire2 = new JButton(new FireAction(false));
     }
 
     public void createSliderListeners() {
@@ -287,7 +272,7 @@ public class GameFrame extends JFrame {
                 try {
                     Power1.setValue(Integer.parseInt(player1power.getText()));
                 } catch (NumberFormatException e) {
-                    player1power.setText("");
+                    player1power.setText("0");
                 }
             }
         });
@@ -297,7 +282,7 @@ public class GameFrame extends JFrame {
                 try {
                     Power2.setValue(Integer.parseInt(player2power.getText()));
                 } catch (NumberFormatException e) {
-                    player2power.setText("");
+                    player2power.setText("0");
                 }
             }
         });
@@ -307,7 +292,7 @@ public class GameFrame extends JFrame {
                 try {
                     Angle1.setValue(Integer.parseInt(player1angle.getText()));
                 } catch (NumberFormatException e) {
-                    player1angle.setText("");
+                    player1angle.setText("0");
                 }
             }
         });
@@ -317,49 +302,56 @@ public class GameFrame extends JFrame {
                 try {
                     Angle2.setValue(Integer.parseInt(player2angle.getText()));
                 } catch (NumberFormatException e) {
-                    player2angle.setText("");
+                    player2angle.setText("0");
                 }
             }
         });
     }
 
-    public void createButtonListeners(final JButton Exit, final JButton Restart, final JButton Save, final JButton Options) {
+    public void createButtonListeners(final JButton Save, final JButton Options) {
 
-        Exit.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (JOptionPane.showConfirmDialog(Exit, "Are you sure you want to exit?", "Exit?",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                    out.close();
-                    System.exit(0);
-                }
-            }
-        });
+        Exit.addActionListener(new ExitAction(Exit));
 
-        Restart.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                if (JOptionPane.showConfirmDialog(Restart,
-                        "Are you sure you want to restart?", "Restart?",
-                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
-                    reset();
-                }
-            } //ADD OPTIONS
-        });
+        Restart.addActionListener(new RestartAction(Restart));
 
         Save.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                out.println(player1nameShow.getText() + " statistics:");
-                out.println("Damage Dealt: " + player1score.getText() + "\n");
-                out.println("Damage Taken: " + player1damages.getText() + "\n");
-                out.println(player2nameShow.getText() + " statistics:");
-                out.println("Damage Dealt: " + player2score.getText() + "\n");
-                out.println("Damage Taken: " + player2damages.getText() + "\n");
+                save();
             }
         });
 
         Options.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
+                new OptionFrame(terrainview);
             }
         });
+    }
+
+    public void createKeyMapping(JPanel panel) {
+        InputMap imap = panel.getInputMap(JComponent.WHEN_FOCUSED);
+        imap.put(KeyStroke.getKeyStroke("Q"), "panel.quit");
+        imap.put(KeyStroke.getKeyStroke("R"), "panel.restart");
+        imap.put(KeyStroke.getKeyStroke("ctrl Q"), "panel.quit");
+        imap.put(KeyStroke.getKeyStroke("ctrl R"), "panel.restart");
+        imap.put(KeyStroke.getKeyStroke("ENTER"), "panel.fire");
+        imap.put(KeyStroke.getKeyStroke("F"), "panel.fire");
+        imap.put(KeyStroke.getKeyStroke("UP"), "panel.incAngle");
+        imap.put(KeyStroke.getKeyStroke("DOWN"), "panel.decAngle");
+        imap.put(KeyStroke.getKeyStroke("RIGHT"), "panel.incPower");
+        imap.put(KeyStroke.getKeyStroke("LEFT"), "panel.decPower");
+
+        amap = panel.getActionMap();
+        amap.put("panel.quit", new ExitAction(Exit));
+        amap.put("panel.restart", new RestartAction(Restart));
+        amap.put("panel.incAngle", new changeAngle(1));
+        amap.put("panel.decAngle", new changeAngle(0));
+        amap.put("panel.incPower", new changePower(1));
+        amap.put("panel.decPower", new changePower(0));
+        fireMap();
+    }
+
+    public void fireMap() {
+        amap.put("panel.fire", new FireAction(!turn));
     }
 
     public void GameUpdate() { // must update scores as well
@@ -387,6 +379,161 @@ public class GameFrame extends JFrame {
             player1power.setEditable(true);
             Power1.setEnabled(true);
             Angle1.setEnabled(true);
+        }
+        fireMap();
+    }
+
+    public void save() {
+        out.println(player1nameShow.getText() + " statistics:");
+        out.println("Damage Dealt: " + player1score.getText() + "\n");
+        out.println("Damage Taken: " + player1damages.getText() + "\n");
+        out.println(player2nameShow.getText() + " statistics:");
+        out.println("Damage Dealt: " + player2score.getText() + "\n");
+        out.println("Damage Taken: " + player2damages.getText() + "\n");
+    }
+
+    class NameFrame extends JFrame {
+
+        public NameFrame() {
+            this.setLocation(500, 400);
+            setTitle("Enter Names");
+            setSize(300, 100);
+            setResizable(false);
+            setVisible(true);
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            JPanel general = new JPanel(new GridLayout(3, 2));
+            final JTextField p1 = new JTextField("Player 1");
+            final JTextField p2 = new JTextField("Player 2");
+            general.add(new JLabel("Player 1 name: "));
+            general.add(p1);
+            general.add(new JLabel("Player 2 name: "));
+            general.add(p2);
+            JButton namesave = new JButton("Save");
+            general.add(namesave);
+            namesave.addActionListener(new ActionListener() {
+                public void actionPerformed(ActionEvent e) {
+                    player1name.setText(p1.getText());
+                    player2name.setText(p2.getText());
+                    player1nameShow.setText(p1.getText());
+                    player2nameShow.setText(p2.getText());
+                    setVisible(false);
+                    dispose();
+                }
+            });
+            add(general);
+        }
+    }
+
+    class FireAction extends AbstractAction {
+
+        public FireAction(boolean which) {
+            putValue(Action.NAME, "FIRE!");
+            putValue(Action.SHORT_DESCRIPTION, "Press to fire and end your turn");
+            putValue("1or2", which);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            // Proceed with firing animation
+            turn = (boolean) getValue("1or2");
+            GameUpdate();
+        }
+    }
+
+    class RestartAction extends AbstractAction {
+
+        public RestartAction(JButton res) {
+            putValue(Action.NAME, "Restart");
+            putValue(Action.SHORT_DESCRIPTION, "Press to restart game");
+            putValue("button", res);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (JOptionPane.showConfirmDialog((JButton) getValue("button"),
+                    "Are you sure you want to restart?", "Restart?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                reset();
+            }
+        }
+    }
+
+    class ExitAction extends AbstractAction {
+
+        public ExitAction(JButton quit) {
+            putValue(Action.NAME, "Quit");
+            putValue(Action.SHORT_DESCRIPTION, "Press to quit game");
+            putValue("Quit", quit);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            if (JOptionPane.showConfirmDialog((JButton) getValue("Quit"), "Are you sure you want to quit?", "Quit?",
+                    JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                if (JOptionPane.showConfirmDialog((JButton) getValue("Quit"), "Do you want to save your statistics?", "Save?",
+                        JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION) {
+                    save();
+                }
+                out.close();
+                System.exit(0);
+            }
+        }
+    }
+
+    class changeAngle extends AbstractAction {
+
+        public changeAngle(int UPorDOWN) {
+            putValue("u_or_d", UPorDOWN);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int uORd = (int) getValue("u_or_d");
+            if (!turn) {
+                if (uORd == 1) {
+                    player1angle.setText((Integer.parseInt(player1angle.getText()) + 1) + "");
+                    Angle1.setValue(Integer.parseInt(player1angle.getText()));
+                } else {
+                    uORd = Math.max((Integer.parseInt(player1angle.getText()) - 1), 0);
+                    player1angle.setText(uORd + "");
+                    Angle1.setValue(Integer.parseInt(player1angle.getText()));
+                }
+            } else {
+                if (uORd == 1) {
+                    player2angle.setText((Integer.parseInt(player2angle.getText()) + 1) + "");
+                    Angle2.setValue(Integer.parseInt(player2angle.getText()));
+                } else {
+                    uORd = Math.max((Integer.parseInt(player2angle.getText()) - 1), 0);
+                    player2angle.setText(uORd + "");
+                    Angle2.setValue(Integer.parseInt(player2angle.getText()));
+                }
+            }
+        }
+    }
+
+    class changePower extends AbstractAction {
+
+        public changePower(int LEFTorRIGHT) {
+            putValue("l_or_r", LEFTorRIGHT);
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            int lORr = (int) getValue("l_or_r");
+            if (!turn) {
+                if (lORr == 1) {
+                    player1power.setText((Integer.parseInt(player1power.getText()) + 1) + "");
+                    Power1.setValue(Integer.parseInt(player1power.getText()));
+                } else {
+                    lORr = Math.max((Integer.parseInt(player1power.getText()) - 1), 0);
+                    player1power.setText(lORr + "");
+                    Power1.setValue(Integer.parseInt(player1power.getText()));
+                }
+            } else {
+                if (lORr == 1) {
+                    player2power.setText((Integer.parseInt(player2power.getText()) + 1) + "");
+                    Power2.setValue(Integer.parseInt(player2power.getText()));
+                } else {
+                    lORr = Math.max((Integer.parseInt(player2power.getText()) - 1), 0);
+                    player2power.setText(lORr + "");
+                    Power2.setValue(Integer.parseInt(player2power.getText()));
+                }
+            }
         }
     }
 }
