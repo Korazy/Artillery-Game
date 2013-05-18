@@ -1,32 +1,23 @@
 package artillerygame;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.geom.Line2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
+import javax.imageio.ImageIO;
 
 import javax.swing.JComponent;
-import javax.swing.Timer;
+
 
 public class Terrain {
 
-    public Terrain () {
-        this.model = new TerrainModel();
-        this.view = new TerrainView(model);
-        this.controller = new TerrainController(model, view);
-    }
-    private TerrainModel model;
-    private TerrainView view;
-    private TerrainController controller;
-}
-
-class TerrainModel {
-
-    public TerrainModel(int width, int height) {
+    public Terrain(int width, int height) {
         this.width = width;
         this.height = height;
         this.randYMin = height * minPercHeight;
@@ -77,6 +68,14 @@ class TerrainModel {
         int range = Math.abs((int) (max - min + 1));
         return (min + randGen.nextInt(range));
     }
+
+    public void clear() {
+        lines.clear();
+        currentIteration = 0;
+        this.randYMin = height * minPercHeight;
+        this.randYMax = height * maxPercHeight;
+        lines.add(new Line2D.Double(0, height / 2, width, height / 2));
+    }
     private int width;
     private int height;
     private double randYMin;
@@ -84,7 +83,6 @@ class TerrainModel {
     private double randYScaling;
     private int currentIteration = 0;
     private ArrayList<Line2D> lines = new ArrayList<Line2D>();
-    
     private static int numIterations = 5;
     private static double randScaling = 0.03;
     private static double minPercHeight = 0.1;
@@ -93,43 +91,53 @@ class TerrainModel {
 
 class TerrainView extends JComponent {
 
-    public TerrainView(TerrainModel model) {
+    public TerrainView(Terrain model) {
         this.model = model;
     }
 
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
+        File imagefile = new File(".\\outer-space_8.jpg");
+        try{
+            img = ImageIO.read(imagefile);
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+        g2.drawImage(img,0,0,null);
+
         g2.setRenderingHint(RenderingHints.KEY_RENDERING,
                 RenderingHints.VALUE_RENDER_QUALITY);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                 RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.setColor(Color.WHITE);
 
         for (Line2D line : model.getLines()) {
             g2.draw(line);
         }
     }
-    private TerrainModel model;
+
+    private Terrain model;
+    private BufferedImage img;
 }
 
 class TerrainController {
 
-    public TerrainController(TerrainModel model, TerrainView view) {
+    public TerrainController(Terrain model, TerrainView view) {
         this.model = model;
         this.view = view;
     }
 
-    public void generateTerrain() {
-        Timer timer = new Timer(delay, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                model.generateStep();
-                view.repaint();
-            }
-        });
-        timer.start();
+    public void start() {
+        model.generate();
+        view.repaint();
     }
-    private TerrainModel model;
+
+    public void restart() {
+        model.clear();
+        start();
+    }
+    private Terrain model;
     private TerrainView view;
-    private static int delay = 2000;
 }
