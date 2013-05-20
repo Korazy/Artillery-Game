@@ -7,18 +7,19 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-public class OptionFrame extends JFrame {
-    public OptionFrame(final TerrainView tv){
-        setSize(400,300);
+public class OptionFrame extends JDialog {
+    public OptionFrame(final TerrainView tv, JFrame game){
+        super(game, "Options", true);
+        setSize(400,200);
         setResizable(false);
-        setVisible(true);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         
         JPanel general = new JPanel(new GridLayout(4,1));
         JPanel panel1 = new JPanel(new GridLayout(1,2));
@@ -26,9 +27,10 @@ public class OptionFrame extends JFrame {
         JPanel panel3 = new JPanel(new GridLayout(1,2));
         JPanel panel4 = new JPanel(new GridLayout(1,2));
         final JComboBox theme = new JComboBox();
-        final JCheckBox drawShot = new JCheckBox("Enable Shot Trajectory Trace");
         final JComboBox player1color = new JComboBox();
         final JComboBox player2color = new JComboBox();
+        final JCheckBox drawShot = new JCheckBox("Enable Shot Trajectory Trace");
+        final JButton save = new JButton ("Save");
         
         theme.addItem("space");
         theme.addItem("desert");
@@ -69,6 +71,11 @@ public class OptionFrame extends JFrame {
                //Add the listener
            } 
         });
+        save.addActionListener(new ActionListener(){
+           public void actionPerformed(ActionEvent e){
+               setVisible(false);
+           } 
+        });
         
         panel1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.BLACK));
         panel2.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
@@ -82,6 +89,7 @@ public class OptionFrame extends JFrame {
         panel3.add(new JLabel("Player 2 Color: "));
         panel3.add(player2color);
         panel4.add(drawShot);
+        panel4.add(save);
         general.add(panel1);
         general.add(panel2);
         general.add(panel3);

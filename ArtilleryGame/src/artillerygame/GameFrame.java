@@ -18,10 +18,12 @@ import javax.swing.BoxLayout;
 import javax.swing.InputMap;
 import javax.swing.JButton;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
@@ -36,6 +38,8 @@ public class GameFrame extends JFrame {
     private boolean turn = false;
     private PrintWriter out;
     private ActionMap amap;
+    private NameFrame NameEnter;
+    private OptionFrame OptionsDialog;
     private TerrainView terrainview;
     private JTextField player1name;
     private JTextField player2name;
@@ -62,6 +66,8 @@ public class GameFrame extends JFrame {
 
     public GameFrame() {
         varInit();
+        NameEnter = new NameFrame(this);
+        NameEnter.setVisible(true);
         setSize(900, 700);
         setResizable(false);
         setVisible(true);
@@ -69,7 +75,6 @@ public class GameFrame extends JFrame {
         createView();
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         GameUpdate();
-        new NameFrame();
     }
 
     public void varInit() {
@@ -107,6 +112,7 @@ public class GameFrame extends JFrame {
 
         player1score.setEditable(false);
         player2score.setEditable(false);
+        
 
     }
 
@@ -122,6 +128,7 @@ public class GameFrame extends JFrame {
         GeneralPanel.add(GamePanel, BorderLayout.CENTER);
         GeneralPanel.add(ControlPanel, BorderLayout.SOUTH);
         createKeyMapping(GeneralPanel);
+        OptionsDialog = new OptionFrame(terrainview, this);
 
         add(GeneralPanel);
     }
@@ -230,7 +237,7 @@ public class GameFrame extends JFrame {
         player1score.setText(score1 + "");
         player2score.setText(score2 + "");
         terraincontroller.restart();
-        new NameFrame();
+        NameEnter.setVisible(true);
     }
 
     public void createFireListeners() {
@@ -322,9 +329,10 @@ public class GameFrame extends JFrame {
 
         Options.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                new OptionFrame(terrainview);
+                OptionsDialog.setVisible(true);
             }
         });
+
     }
 
     public void createKeyMapping(JPanel panel) {
@@ -348,6 +356,12 @@ public class GameFrame extends JFrame {
         amap.put("panel.incPower", new changePower(1));
         amap.put("panel.decPower", new changePower(0));
         fireMap();
+
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(new RestartAction(Restart));
+        menu.add(new ExitAction(Exit));
+        panel.setComponentPopupMenu(menu);
+
     }
 
     public void fireMap() {
@@ -392,15 +406,13 @@ public class GameFrame extends JFrame {
         out.println("Damage Taken: " + player2damages.getText() + "\n");
     }
 
-    class NameFrame extends JFrame {
+    class NameFrame extends JDialog {
 
-        public NameFrame() {
-            this.setLocation(500, 400);
-            setTitle("Enter Names");
-            setSize(300, 100);
+        public NameFrame(JFrame frame) {
+            super(frame, "Enter Names", true);
+            setSize(200,100);
+            setLocation(500, 400);
             setResizable(false);
-            setVisible(true);
-            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             JPanel general = new JPanel(new GridLayout(3, 2));
             final JTextField p1 = new JTextField("Player 1");
             final JTextField p2 = new JTextField("Player 2");
@@ -417,7 +429,6 @@ public class GameFrame extends JFrame {
                     player1nameShow.setText(p1.getText());
                     player2nameShow.setText(p2.getText());
                     setVisible(false);
-                    dispose();
                 }
             });
             add(general);
