@@ -1,3 +1,4 @@
+/*
 package artillerygame;
 
 import java.awt.Color;
@@ -19,7 +20,7 @@ public class OptionFrame extends JFrame {
         setResizable(false);
         setVisible(true);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        
+
         JPanel general = new JPanel(new GridLayout(4,1));
         JPanel panel1 = new JPanel(new GridLayout(1,2));
         JPanel panel2 = new JPanel(new GridLayout(1,2));
@@ -29,19 +30,19 @@ public class OptionFrame extends JFrame {
         final JCheckBox drawShot = new JCheckBox("Enable Shot Trajectory Trace");
         final JComboBox player1color = new JComboBox();
         final JComboBox player2color = new JComboBox();
-        
+
         theme.addItem("space");
         theme.addItem("desert");
         theme.addItem("nature");
-        
+
         player1color.addItem("Red");
         player1color.addItem("Blue");
         player1color.addItem("Green");
-        
+
         player2color.addItem("Red");
         player2color.addItem("Blue");
         player2color.addItem("Green");
-        
+
         theme.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -49,32 +50,32 @@ public class OptionFrame extends JFrame {
                 world.setBackground(selection);
             }
         });
-        
+
         player1color.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 //change tank color
             }
         });
-        
+
         player2color.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 // change tank color
             }
         });
-        
+
         drawShot.addActionListener(new ActionListener(){
            public void actionPerformed(ActionEvent e){
                //Add the listener
-           } 
+           }
         });
-        
+
         panel1.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.BLACK));
         panel2.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.RED));
         panel3.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.BLUE));
         panel4.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.GREEN));
-        
+
         panel1.add(new JLabel("Theme: "));
         panel1.add(theme);
         panel2.add(new JLabel("Player 1 Color: "));
@@ -89,3 +90,4 @@ public class OptionFrame extends JFrame {
         add(general);
     }
 }
+*/
