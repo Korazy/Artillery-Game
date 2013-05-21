@@ -16,13 +16,14 @@ public class Game {
     }
 
     public void loop() {
+        final int refreshRate = GameOptions.getRefreshRate();
         new Thread(new Runnable() {
             public void run() {
                 model.running = true;
                 while (model.running) {
                     try {
                         update();
-                        Thread.sleep(20);
+                        Thread.sleep(refreshRate);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -48,7 +49,10 @@ public class Game {
 class GameModel {
 
     public GameModel() {
-        this.world = new World();
+        world   = new World();
+        player1 = GameOptions.getPlayer1();
+        player2 = GameOptions.getPlayer2();
+        GameOptions.setWorld(world);
     }
 
     public void update() {
@@ -57,6 +61,8 @@ class GameModel {
 
 
     boolean running = false;
+    Player player1;
+    Player player2;
     World world;
 }
 
@@ -80,12 +86,6 @@ class GameView extends JComponent implements View {
     @Override
     public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
-        /*
-        g2.setRenderingHint(RenderingHints.KEY_RENDERING,
-                RenderingHints.VALUE_RENDER_QUALITY);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);
-                */
         WorldView worldView = model.world.getView();
         worldView.draw(g2);
     }

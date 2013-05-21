@@ -30,9 +30,9 @@ class TerrainModel {
     public TerrainModel() {
         this.width = GameOptions.getGameWidth();
         this.height = GameOptions.getGameHeight();
-        this.lowestHeight = (int) (height * minPercHeight);
-        this.highestHeight = (int) (height * maxPercHeight);
-        this.landHeight = new int[width];
+        this.lowestHeight = (int) (height * GameOptions.getMinPercHeight());
+        this.highestHeight = (int) (height * GameOptions.getMaxPercHeight());
+        this.landHeight = new int[width+1];
     }
 
     int[] getLandHeight() {
@@ -74,18 +74,15 @@ class TerrainModel {
     }
 
     public void initialize() {
-
         generateTerrain();
-        smoothenTerrain();
+        //smoothenTerrain();
     }
-    
+
     int width;
     int height;
     int lowestHeight;
     int highestHeight;
     int[] landHeight;
-    private static double minPercHeight = 0.15;
-    private static double maxPercHeight = 0.75;
 }
 
 class TerrainView {
@@ -103,7 +100,8 @@ class TerrainView {
         int height = model.height;
         int[] landHeight = model.landHeight;
         for (int i = 0; i < width - 1; i++) {
-            g.draw(new Line2D.Double(i, height - 1, i, height - 1 - landHeight[i]));
+            //i, height - 1,
+            g.draw(new Line2D.Double(i, landHeight[i], i, height));
         }
     }
     private TerrainModel model;

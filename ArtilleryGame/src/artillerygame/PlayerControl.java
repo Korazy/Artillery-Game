@@ -17,15 +17,23 @@ import javax.swing.event.ChangeListener;
 
 public class PlayerControl {
 
-    public PlayerControl() {
-        model = new PlayerControlModel();
+    public PlayerControl(Player player) {
+        model = new PlayerControlModel(player);
         view = new PlayerControlView(model);
         controller = new PlayerControlController(model, view);
-        controller.initializeListeners();
     }
 
     public void update() {
         view.update();
+    }
+
+    public void setActive(boolean active) {
+        model.active = active;
+        view.update();
+    }
+
+    public PlayerControlModel getModel() {
+        return model;
     }
 
     public PlayerControlView getView() {
@@ -42,10 +50,17 @@ public class PlayerControl {
 
 class PlayerControlModel {
 
-    boolean active;
+    public PlayerControlModel(Player player) {
+        this.player = player;
+    }
+
+    public Player getPlayer() {
+        return player;
+    }
+    boolean active = true;
     int power;
     int angle;
-    Player player = new Player();
+    Player player;
 }
 
 class PlayerControlView extends JPanel implements View {
@@ -76,6 +91,10 @@ class PlayerControlView extends JPanel implements View {
     public void update() {
         Player player = model.player;
         playerLabel.setText(player.getName());
+        powerText.setEnabled(model.active);
+        angleText.setEnabled(model.active);
+        powerSlider.setEnabled(model.active);
+        angleSlider.setEnabled(model.active);
         fireButton.setEnabled(model.active);
     }
     JTextField powerText = new JTextField("0");
@@ -87,11 +106,12 @@ class PlayerControlView extends JPanel implements View {
     PlayerControlModel model;
 }
 
-class PlayerControlController {
+class PlayerControlController implements Controller {
 
     public PlayerControlController(PlayerControlModel model, PlayerControlView view) {
         this.model = model;
         this.view = view;
+        initializeListeners();
     }
 
     public void addSliderTextListener(final JSlider slider, final JTextField text) {
@@ -114,15 +134,54 @@ class PlayerControlController {
         });
     }
 
-    public void addFireButtonListener() {
-        view.fireButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                model.active = false;
+    public void addSliderAngleListener() {
+        final JSlider slider = view.angleSlider;
+        final JTextField text = view.angleText;
+        view.angleSlider.addChangeListener(new ChangeListener() {
+            public void stateChanged(ChangeEvent e) {
+                int angle = slider.getValue();
+                model.getPlayer().getTank().getModel().setAngle(angle);
+                view.update();
+            }
+        });
+
+        view.angleText.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent event) {
+                try {
+                    slider.setValue(Integer.parseInt(text.getText()));
+                } catch (NumberFormatException e) {
+                    text.setText("0");
+                }
+                int angle = slider.getValue();
+                model.getPlayer().getTank().getModel().setAngle(angle);
                 view.update();
             }
         });
     }
 
+    public void addFireButtonListener() {
+        view.fireButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                Player player = model.getPlayer();
+                Tank tank = player.getTank();
+                int angle = view.angleSlider.getValue();
+                tank.getModel().setAngle(angle);
+                int power = view.powerSlider.getValue();
+                tank.getModel().setPower(power);
+                System.out.println(power);
+                tank.fireBullet();
+                model.active = !model.active;
+                if (GameOptions.getCurrentPlayer() == GameOptions.getPlayer1()) {
+                    GameOptions.setCurrentPlayer(GameOptions.getPlayer2());
+                } else {
+                    GameOptions.setCurrentPlayer(GameOptions.getPlayer1());
+                }
+                view.update();
+            }
+        });
+    }
+
+    @Override
     public void initializeListeners() {
         addSliderTextListener(view.powerSlider, view.powerText);
         addSliderTextListener(view.angleSlider, view.angleText);

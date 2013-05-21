@@ -1,6 +1,8 @@
 package artillerygame;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class World {
@@ -10,6 +12,11 @@ public class World {
         view = new WorldView(model);
     }
 
+    public void restart() {
+        model.restart();
+        view.update();
+    }
+
     public void update() {
         //model.update();
         view.update();
@@ -17,6 +24,14 @@ public class World {
 
     public WorldModel getModel() {
         return model;
+    }
+
+    public Tank getPlayer1Tank() {
+        return model.player1Tank;
+    }
+
+    public Tank getPlayer2Tank() {
+        return model.player1Tank;
     }
 
     public WorldView getView() {
@@ -30,16 +45,22 @@ class WorldModel {
 
     public WorldModel() {
         numTanks = 2;
-        player1Tank = new Tank();
-        player2Tank = new Tank();
         terrain = new Terrain();
+        player1Tank = GameOptions.getPlayer1().getTank();
+        player2Tank = GameOptions.getPlayer2().getTank();
         initialize();
     }
 
     public void initialize() {
-        randomPositionTank(player1Tank, player2Tank);
         randomPositionTank(player2Tank, player1Tank);
+        randomPositionTank(player1Tank, player2Tank);
+    }
 
+    public void restart() {
+        terrain = new Terrain();
+        player1Tank = GameOptions.getPlayer1().getTank();
+        player2Tank = GameOptions.getPlayer2().getTank();
+        initialize();
     }
 
     public void positionTank(Tank tank, int x, int gap) {
@@ -62,7 +83,7 @@ class WorldModel {
                 lowest = landHeight[i];
             }
         }
-        
+
         // Flatten section + gap around it.
         for (int i = x1 - gap; i <= x2 + gap; i++) {
             if (i >= 0 && i < width) {
@@ -70,10 +91,9 @@ class WorldModel {
             }
         }
 
-        System.out.println("X " + x + " Lowest " + lowest + " Orig " + landHeight[x]);
-
         model.setPositionX(x);
-        model.setPositionY(GameOptions.getGameHeight() - lowest);
+        model.setPositionY(lowest);
+        model.update();
     }
 
     public void randomPositionTank(Tank newTank, Tank oldTank) {
@@ -103,7 +123,13 @@ class WorldModel {
 
         positionTank(newTank, x, 5);
     }
+
+    public Terrain getTerrain() {
+        return terrain;
+    }
     int numTanks;
+    Bullet bullet;
+    ArrayList<Bullet> oldBullets;
     Tank player1Tank;
     Tank player2Tank;
     Terrain terrain;

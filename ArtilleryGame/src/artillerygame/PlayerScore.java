@@ -1,5 +1,7 @@
 package artillerygame;
 
+import artillerygame.Player;
+import artillerygame.View;
 import java.awt.Graphics;
 import java.awt.GridLayout;
 import javax.swing.BorderFactory;
@@ -9,23 +11,28 @@ import javax.swing.JTextField;
 
 public class PlayerScore {
 
-    public PlayerScore() {
-        model = new PlayerScoreModel();
+    public PlayerScore(Player player) {
+        model = new PlayerScoreModel(player);
         view = new PlayerScoreView(model);
-        controller = new PlayerScoreController(model, view);
     }
 
     PlayerScoreView getView() {
         return view;
     }
+
+    public void update() {
+        view.update();
+    }
+
     private PlayerScoreModel model;
     private PlayerScoreView view;
-    private PlayerScoreController controller;
 }
 
 class PlayerScoreModel {
-
-    Player player = new Player();
+    public PlayerScoreModel(Player player) {
+        this.player = player;
+    }
+    Player player;
 }
 
 class PlayerScoreView extends JPanel implements View {
@@ -37,10 +44,10 @@ class PlayerScoreView extends JPanel implements View {
         add(new JLabel("Name: "));
         playerName.setEditable(false);
         add(playerName);
-        add(new JLabel("Damage Dealt: "));  // get amount of hits on player from model
+        add(new JLabel("Damage Dealt: ")); // get amount of hits on player from model
         playerScore.setEditable(false);
         add(playerScore);
-        add(new JLabel("Damage Taken: "));  // get amount of hits from player from model
+        add(new JLabel("Damage Taken: ")); // get amount of hits from player from model
         playerDamage.setEditable(false);
         add(playerDamage);
     }
@@ -55,22 +62,12 @@ class PlayerScoreView extends JPanel implements View {
     public void update() {
         Player player = model.player;
         playerName.setText(player.getName());
+        playerDamage.setText(player.getTank().getModel().getDamage() + "");
         playerScore.setText(player.getScore() + "");
-        playerDamage.setText(player.getDamage() + "");
     }
 
     JTextField playerName = new JTextField();
     JTextField playerScore = new JTextField();
     JTextField playerDamage = new JTextField();
     PlayerScoreModel model;
-}
-
-class PlayerScoreController {
-
-    public PlayerScoreController(PlayerScoreModel model, PlayerScoreView view) {
-        this.model = model;
-        this.view = view;
-    }
-    private PlayerScoreModel model;
-    private PlayerScoreView view;
 }
