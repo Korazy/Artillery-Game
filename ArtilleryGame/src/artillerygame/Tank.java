@@ -112,8 +112,8 @@ class TankView {
         AffineTransform orig = g.getTransform();
         g.rotate((double)model.getAngle());
         Rectangle2D turret = new Rectangle2D.Double(
-                x,// + Tank.TURRETX,
-                y,// + Tank.TURRETY,
+                x + Tank.TURRETX,
+                y + Tank.TURRETY,
                 Tank.TURRET_WIDTH,
                 Tank.TURRET_HEIGHT
         );

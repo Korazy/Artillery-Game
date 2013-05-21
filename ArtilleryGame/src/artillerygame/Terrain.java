@@ -21,7 +21,6 @@ public class Terrain {
     TerrainModel getModel() {
         return model;
     }
-
     TerrainModel model;
     TerrainView view;
 }
@@ -75,23 +74,18 @@ class TerrainModel {
     }
 
     public void initialize() {
-        Runnable task = (new Runnable() {
-            public void run() {
-                generateTerrain();
-                smoothenTerrain();
-            }
-        });
-        Thread thread = new Thread(task);
-        thread.start();
-    }
 
+        generateTerrain();
+        smoothenTerrain();
+    }
+    
     int width;
     int height;
     int lowestHeight;
     int highestHeight;
     int[] landHeight;
     private static double minPercHeight = 0.15;
-    private static double maxPercHeight = 0.65;
+    private static double maxPercHeight = 0.75;
 }
 
 class TerrainView {

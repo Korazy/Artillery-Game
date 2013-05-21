@@ -37,12 +37,9 @@ class WorldModel {
     }
 
     public void initialize() {
-        new Thread(new Runnable() {
-            public void run() {
-                randomPositionTank(player1Tank, player2Tank);
-                randomPositionTank(player2Tank, player1Tank);
-            }
-        }).start();
+        randomPositionTank(player1Tank, player2Tank);
+        randomPositionTank(player2Tank, player1Tank);
+
     }
 
     public void positionTank(Tank tank, int x, int gap) {
@@ -65,13 +62,15 @@ class WorldModel {
                 lowest = landHeight[i];
             }
         }
-
+        
         // Flatten section + gap around it.
-        for (int i = x1 - gap; i <= x2 + gap; i++)
-            if (i >= 0 && i < width)
+        for (int i = x1 - gap; i <= x2 + gap; i++) {
+            if (i >= 0 && i < width) {
                 landHeight[i] = lowest;
+            }
+        }
 
-        System.out.println("X " + x + " Lowest " + lowest + " Orig "+ landHeight[x]);
+        System.out.println("X " + x + " Lowest " + lowest + " Orig " + landHeight[x]);
 
         model.setPositionX(x);
         model.setPositionY(GameOptions.getGameHeight() - lowest);
@@ -95,9 +94,9 @@ class WorldModel {
                 clearSpace = false;
             }
             if (((x + Tank.WIDTH >= oldX - Tank.WIDTH - minimumSeparation)
-              && (x + Tank.WIDTH <= oldX + Tank.WIDTH + minimumSeparation))
-              || ((x - Tank.WIDTH >= oldX - Tank.WIDTH - minimumSeparation)
-              && (x - Tank.WIDTH <= oldX + Tank.WIDTH + minimumSeparation))) {
+                    && (x + Tank.WIDTH <= oldX + Tank.WIDTH + minimumSeparation))
+                    || ((x - Tank.WIDTH >= oldX - Tank.WIDTH - minimumSeparation)
+                    && (x - Tank.WIDTH <= oldX + Tank.WIDTH + minimumSeparation))) {
                 clearSpace = false;
             }
         } while (!clearSpace);
