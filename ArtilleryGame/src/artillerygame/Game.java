@@ -87,6 +87,7 @@ class GameView extends JComponent implements View {
         WorldView worldView = model.world.getView();
         worldView.draw(g2);
     }
+    
     Graphics2D graphicsContext;
     GameModel model;
 }

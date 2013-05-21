@@ -3,6 +3,7 @@ package artillerygame;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 
 public class Tank {
@@ -25,10 +26,10 @@ public class Tank {
 
     public static int TURRETX = 5;
     public static int TURRETY = 5;
-    public static int TURRENT_WIDTH = 9;
+    public static int TURRET_WIDTH = 15;
     public static int TURRET_HEIGHT= 4;
     public static int WIDTH = 20;
-    public static int HEIGHT = 20;
+    public static int HEIGHT = 10;
 }
 
 class TankModel {
@@ -98,16 +99,26 @@ class TankView {
 
     void draw(Graphics2D g) {
         g.setStroke(new BasicStroke(1.0F));
-        int x = model.getPositionX()+100;
-        int y = model.getPositionY()+100;
+        int x = model.getPositionX();
+        int y = model.getPositionY();
         Rectangle2D rect = new Rectangle2D.Double(
                 x - Tank.WIDTH/2,
                 y - Tank.HEIGHT,
                 Tank.WIDTH,
                 Tank.HEIGHT);
-        System.out.println("HEllo");
         g.setColor(Color.YELLOW);
         g.fill(rect);
+
+        AffineTransform orig = g.getTransform();
+        g.rotate((double)model.getAngle());
+        Rectangle2D turret = new Rectangle2D.Double(
+                x,// + Tank.TURRETX,
+                y,// + Tank.TURRETY,
+                Tank.TURRET_WIDTH,
+                Tank.TURRET_HEIGHT
+        );
+        g.draw(turret);
+        g.setTransform(orig);
     }
 
     private TankModel model;

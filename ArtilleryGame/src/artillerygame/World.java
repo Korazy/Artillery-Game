@@ -71,10 +71,10 @@ class WorldModel {
             if (i >= 0 && i < width)
                 landHeight[i] = lowest;
 
-        System.out.println("X " + x + " Lowest " + lowest);
+        System.out.println("X " + x + " Lowest " + lowest + " Orig "+ landHeight[x]);
 
         model.setPositionX(x);
-        model.setPositionY(lowest);
+        model.setPositionY(GameOptions.getGameHeight() - lowest);
     }
 
     public void randomPositionTank(Tank newTank, Tank oldTank) {
@@ -86,7 +86,7 @@ class WorldModel {
         TankModel oldModel = oldTank.getModel();
         int oldX = oldModel.getPositionX();
         int oldY = oldModel.getPositionY();
-        int minimumSeparation = 50;
+        int minimumSeparation = 400;
 
         do {
             clearSpace = true;

@@ -90,8 +90,8 @@ class TerrainModel {
     int lowestHeight;
     int highestHeight;
     int[] landHeight;
-    private static double minPercHeight = 0.10;
-    private static double maxPercHeight = 0.75;
+    private static double minPercHeight = 0.15;
+    private static double maxPercHeight = 0.65;
 }
 
 class TerrainView {
