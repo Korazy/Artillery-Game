@@ -3,7 +3,6 @@ package artillerygame;
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
-import javax.swing.BoxLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
@@ -14,6 +13,7 @@ public class MainFrame {
             public void run() {
                 final JFrame frame = new JFrame();
                 frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
 
                 final JPanel score = new JPanel(new GridLayout(1, 2));
                 score.add((new PlayerScore()).getView());

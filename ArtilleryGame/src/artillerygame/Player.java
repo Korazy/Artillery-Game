@@ -38,6 +38,6 @@ public class Player {
 
     private String name = "Player1";
     private Color color = Color.BLUE;
-    private int score;
-    private int damage;
+    private int score = 0;
+    private int damage = 0;
 }

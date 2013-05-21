@@ -26,7 +26,7 @@ public class Tank {
 
     public static int TURRETX = 5;
     public static int TURRETY = 5;
-    public static int TURRET_WIDTH = 15;
+    public static int TURRET_WIDTH = 30;
     public static int TURRET_HEIGHT= 4;
     public static int WIDTH = 20;
     public static int HEIGHT = 10;
@@ -52,6 +52,10 @@ class TankModel {
 
     public double getAngle() {
         return angle;
+    }
+
+    public double getAngleRadians() {
+        return ((angle * Math.PI)/180.0);
     }
 
     public double getPower() {
@@ -106,17 +110,19 @@ class TankView {
                 y - Tank.HEIGHT,
                 Tank.WIDTH,
                 Tank.HEIGHT);
-        g.setColor(Color.YELLOW);
-        g.fill(rect);
 
         AffineTransform orig = g.getTransform();
-        g.rotate((double)model.getAngle());
         Rectangle2D turret = new Rectangle2D.Double(
-                x + Tank.TURRETX,
-                y + Tank.TURRETY,
+                x,
+                y,
                 Tank.TURRET_WIDTH,
                 Tank.TURRET_HEIGHT
         );
+
+        g.setColor(Color.YELLOW);
+        g.fill(rect);
+        g.rotate(Math.PI);
+        //g.rotate((double)model.getAngleRadians());
         g.draw(turret);
         g.setTransform(orig);
     }
